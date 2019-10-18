@@ -1,0 +1,72 @@
+Add this to your current EC2 create process:
+
+db XPPNP  ( use the variable from your create script  )
+spdba
+startup
+exit
+***Verify no errors on startup***
+
+Modify listener.ora
+db ora122
+vi $ORACLE_HOME/network/admin/listener.ora 
+change highlighted values below with the values you have from the EC2 create: 
+
+
+LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS_LIST =
+        (ADDRESS = (PROTOCOL = TCP)(HOST = 10.146.55.41)(PORT = 1521))
+      )
+      (ADDRESS_LIST =
+        (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC))
+      )
+    )
+  )
+
+
+SID_LIST_LISTENER =
+  (SID_LIST =
+    (SID_DESC =
+      (SDU=32767)
+      (ORACLE_HOME = /u01/app/oracle/product/12.2.0.1/dbhome_1)
+      (SID_NAME = XPPNP)
+    )
+)
+
+
+
+Start Listener:
+lsnrctl start
+
+
+Edit tnsnames.ora:
+
+vi /var/opt/oracle/tnsnames.ora
+
+change highlighted values below with the values you have from the EC2 create:
+
+XPPNP =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = 10.146.55.41)(PORT = 1521))
+    (CONNECT_DATA = (SERVICE_NAME = XPPNP)))
+P_CMNM =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = combineddb.cte-prod.aws.gwl.com)(PORT = 1521))
+    (CONNECT_DATA = (SERVICE_NAME = XPCMNM)))
+XPCMNM =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = combineddb.cte-prod.aws.gwl.com)(PORT = 1521))
+    (CONNECT_DATA = (SERVICE_NAME = XPCMNM)))
+
+
+
+
+Verify listener:
+
+tnsping XPPNP
+
+Output should look like:
+
+Attempting to contact (DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = 10.146.55.41)(PORT = 1521)) (CONNECT_DATA = (SERVICE_NAME = XPPNP)))
+OK (0 msec)
