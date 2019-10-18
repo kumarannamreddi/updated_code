@@ -1,0 +1,16 @@
+---
+- name: copy sql file over to dest
+  copy:
+    src: count.sql
+    dest: /home/oracle/startupcode.sql
+    owner: oracle
+    group: oinstall
+    mode: 0644
+
+- name:  Verify oraclesid startup
+  become: yes
+  become_user: oracle
+  command: "db {{ oraclesid }} && spbda"
+  args:
+    _uses_shell:  true
+    stdin: "@/home/oracle/startupcode.sql"
